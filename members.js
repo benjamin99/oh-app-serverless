@@ -1,7 +1,12 @@
 'use strict';
 
-const table = 'members';
 const crud = require('./crudHandlers');
+const utils = require('./utils');
+const ERROR_CODE = utils.ERROR_CODE;
+const render = utils.render;
+const handleDynamoError = utils.handleDynamoError;
+
+const table = 'members';
 
 /** member CRUD implementations */
 
@@ -17,63 +22,56 @@ const headers = { 'Access-Control-Allow-Origin': '*' };
 
 module.exports.create = (event, context, callback) => {
   create(event, (error, result) => {
+    if (error) {
+      return handleDynamoError(context, headers, error);
+    }
 
-    // TODO: should handle the error message ...
-
-    const response = {
-      statusCode: 201,
-      headers,
-      body: JSON.stringify(result)
-    };
-
-    context.succeed(response);
+    render(context, 201, headers, result);
   });
 };
 
 module.exports.list = (event, context, callback) => {
   list(event, (error, result) => {
-    const response = {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(result)
-    };
+    if (error) {
+      return handleDynamoError(context, headers, error);
+    }
 
-    context.succeed(response);
+    render(context, 200, headers, result);
   });
 };
 
 module.exports.show = (event, context, callback) => {
-  show(event, (error, result) => {
-    const response = {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(result)
+  show(event, (error, item) => {
+    if (error) {
+      return handleDynamoError(context, headers, error);
     }
 
-    context.succeed(response);
+    const status = item ? 200 : 404;
+    const body = item ? item : {
+      error: ERROR_CODE.memberNotFound,
+      message: 'member not found'
+    };
+
+    render(context, status, headers, body);
   });
 };
 
 module.exports.update = (event, context, callback) => {
   update(event, (error, result) => {
-    const response = {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(result)
+    if (error) {
+      return handleDynamoError(context, headers, error);
     }
 
-    context.succeed(response);
+    render(context, 200, headers, result);
   });
 };
 
 module.exports.delete = (event, context, callback) => {
   destroy(event, (error, result) => {
-    const response = {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(result)
-    };
+    if (error) {
+      return handleDynamoError(context, headers, error);
+    }
 
-    context.succeed(response);
+    render(context, 200, headers, result);
   });
 };

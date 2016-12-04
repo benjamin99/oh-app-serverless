@@ -23,7 +23,7 @@ module.exports.createHandler = function(table) {
 
     return dynamo.put(params, (error, data) => {
       if (error) {
-        callback(error);
+        return callback(error);
       }
 
       callback(error, params.Item);
@@ -36,7 +36,7 @@ module.exports.listHandler = function(table) {
     const params = { TableName: table };
     return dynamo.scan(params, (error, data) => {
       if (error) {
-        callback(error);
+        return callback(error);
       }
 
       callback(error, data.Items);
@@ -53,7 +53,7 @@ module.exports.showHandler = function(table) {
 
     return dynamo.get(params, (error, data) => {
       if (error) {
-        callback(error);
+        return callback(error);
       }
 
       callback(error, data.Item);
@@ -75,7 +75,7 @@ module.exports.updateHandler = function(table) {
 
     return dynamo.put(params, (error, data) => {
       if (error) {
-        callback(error);
+        return callback(error);
       }
 
       callback(error, params.Item);
@@ -92,7 +92,7 @@ module.exports.destroyHandler = function(table) {
 
     return dynamo.delete(params, (error, data) => {
       if (error) {
-        callback(error);
+        return callback(error);
       }
 
       callback(error, params.Key);
