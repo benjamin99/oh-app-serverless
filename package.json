@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "eslint": "^3.11.1",
+    "eslint-config-dcard": "^3.0.0"
+  },
+  "dependencies": {
+    "uuid": "^3.0.1"
+  }
+}
