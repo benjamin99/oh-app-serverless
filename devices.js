@@ -1,6 +1,6 @@
 'use strict';
 
-const table = 'members';
+const table = 'devices';
 const crud = require('./crudHandlers');
 
 /** member CRUD implementations */

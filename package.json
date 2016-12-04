@@ -4,6 +4,7 @@
     "eslint-config-dcard": "^3.0.0"
   },
   "dependencies": {
+    "lodash": "^4.17.2",
     "uuid": "^3.0.1"
   }
 }

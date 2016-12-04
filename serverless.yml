@@ -8,6 +8,17 @@ service: the-oh-app
 provider:
   name: aws
   runtime: nodejs4.3
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - dynamodb:DescribeTable
+      - dynamodb:Query
+      - dynamodb:Scan
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+      - dynamodb:DeleteItem
+    Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
 functions:
   index:
@@ -46,6 +57,36 @@ functions:
       - http:
           path: /members/{id}
           method: delete
+  device-create:
+    handler: devices.create
+    events:
+      - http:
+          path: /devices
+          method: post
+  device-list:
+    handler: devices.list
+    events:
+      - http:
+          path: /devices
+          method: get
+  device-show:
+    handler: devices.show
+    events:
+      - http:
+          path: /devices/{id}
+          method: get
+  device-update:
+    handler: devices.update
+    events:
+      - http:
+          path: /devices/{id}
+          method: put
+  device-delete:
+    handler: devices.delete
+    events:
+      - http:
+          path: /devices/{id}
+          method: delete
 
 resources:
   Resources:
@@ -54,6 +95,19 @@ resources:
       DeletionPolicy: Retain
       Properties:
         TableName: members
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    DeviceTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: devices
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
@@ -77,24 +131,3 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
-
-    DynamoDBIamPolicy:
-      Type: AWS::IAM::Policy
-      DependsOn: MemberTable
-      Properties:
-        PolicyName: lambda-dynamodb
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - dynamodb:DescribeTable
-                - dynamodb:Query
-                - dynamodb:Scan
-                - dynamodb:GetItem
-                - dynamodb:PutItem
-                - dynamodb:UpdateItem
-                - dynamodb:DeleteItem
-              Resource: arn:aws:dynamodb:*:*:table/members
-        Roles:
-          - Ref: IamRoleLambdaExecution
