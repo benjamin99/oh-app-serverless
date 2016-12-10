@@ -4,6 +4,8 @@
     "eslint-config-dcard": "^3.0.0"
   },
   "dependencies": {
+    "bluebird": "^3.4.6",
+    "joi": "^10.0.5",
     "lodash": "^4.17.2",
     "uuid": "^3.0.1"
   }
