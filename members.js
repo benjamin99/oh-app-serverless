@@ -72,6 +72,13 @@ module.exports.delete = (event, context, callback) => {
       return handleDynamoError(context, headers, error);
     }
 
-    render(context, 200, headers, result);
+    if (!result.Attributes) {
+      return render(context, 404, headers, {
+        error: ERROR_CODE.memberNotFound,
+        message: 'member not found'
+      });
+    }
+
+    render(context, 200, headers, { id: result.Attributes.id });
   });
 };

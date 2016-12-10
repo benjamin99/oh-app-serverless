@@ -1,6 +1,6 @@
 'use strict';
 
-const AWS = require('aws-sdk');  
+const AWS = require('aws-sdk');
 const uuid = require('uuid');
 const merge = require('lodash').merge;
 const dynamo = new AWS.DynamoDB.DocumentClient();
@@ -87,7 +87,8 @@ module.exports.destroyHandler = function(table) {
   return function(event, callback) {
     const params = {
       TableName: table,
-      Key: { id: event.pathParameters.id }
+      Key: { id: event.pathParameters.id },
+      ReturnValues: 'ALL_OLD'
     };
 
     return dynamo.delete(params, (error, data) => {
@@ -95,7 +96,7 @@ module.exports.destroyHandler = function(table) {
         return callback(error);
       }
 
-      callback(error, params.Key);
+      callback(error, data);
     });
   }
 }

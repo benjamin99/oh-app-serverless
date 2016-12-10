@@ -8,7 +8,7 @@ const ERROR_CODE = module.exports.ERROR_CODE = {
   serviceUnavailable: 1003,
 
   // 11xx: validation error
-  
+
   // 12xx: resource error
   memberNotFound: 1200,
   deviceNotFound: 1201,
