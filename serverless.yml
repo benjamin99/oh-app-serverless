@@ -20,69 +20,84 @@ provider:
       - dynamodb:DeleteItem
     Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
+plugins:
+  - serverless-dynamodb-local
+  - serverless-mocha-plugin
+
+custom:
+  dynamodb:
+    start:
+      port: 9000
+      inMemory: true
+      migration: true
+    migration:
+      dir: ./migrations
+  serverless-mocha-plugin:
+    testTemplate: test/templates/test.ejs
+
 functions:
   index:
-    handler: handler.index
+    handler: handlers/index.index
     events:
       - http:
           path: /index
           method: get
   member-create:
-    handler: members.create
+    handler: handlers/members.create
     events:
       - http:
           path: /members
           method: post
   member-list:
-    handler: members.list
+    handler: handlers/members.list
     events:
       - http:
           path: /members
           method: get
   member-show:
-    handler: members.show
+    handler: handlers/members.show
     events:
       - http:
           path: /members/{id}
           method: get
   member-update:
-    handler: members.update
+    handler: handlers/members.update
     events:
       - http:
           path: /members/{id}
           method: put
   member-delete:
-    handler: members.delete
+    handler: handlers/members.delete
     events:
       - http:
           path: /members/{id}
           method: delete
   device-create:
-    handler: devices.create
+    handler: handlers/devices.create
     events:
       - http:
           path: /devices
           method: post
   device-list:
-    handler: devices.list
+    handler: handlers/devices.list
     events:
       - http:
           path: /devices
           method: get
   device-show:
-    handler: devices.show
+    handler: handlers/devices.show
     events:
       - http:
           path: /devices/{id}
           method: get
   device-update:
-    handler: devices.update
+    handler: handlers/devices.update
     events:
       - http:
           path: /devices/{id}
           method: put
   device-delete:
-    handler: devices.delete
+    handler: handlers/devices.delete
     events:
       - http:
           path: /devices/{id}

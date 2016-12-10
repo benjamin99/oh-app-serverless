@@ -1,12 +1,12 @@
 'use strict';
 
-const AWS = require('aws-sdk');  
 const uuid = require('uuid');
 const merge = require('lodash').merge;
-const dynamo = new AWS.DynamoDB.DocumentClient();
+const dynamo = require('./dynamo');
 
 module.exports.createHandler = function(table) {
   return function(event, callback) {
+    console.log(event);
     const data = JSON.parse(event.body);
 
     const datetime = new Date().getTime();
@@ -21,7 +21,7 @@ module.exports.createHandler = function(table) {
       Item: data
     };
 
-    return dynamo.put(params, (error, data) => {
+    return dynamo.putItem(params, (error, data) => {
       if (error) {
         return callback(error);
       }
