@@ -28,31 +28,31 @@ functions:
           path: /index
           method: get
   event-create:
-    handler: localEvents.create
+    handler: events.create
     events:
       - http:
           path: /events
           method: post
   event-list:
-    handler: localEvents.list
+    handler: events.list
     events:
       - http:
           path: /events
           method: get
   event-show:
-    handler: localEvents.show
+    handler: events.show
     events:
       - http:
           path: /events/{id}
           method: get
   event-update:
-    handler: localEvents.update
+    handler: events.update
     events:
       - http:
           path: /events/{id}
           method: put
   event-delete:
-    handler: localEvents.destroy
+    handler: events.destroy
     events:
       - http:
           path: /events/{id}
@@ -151,7 +151,7 @@ resources:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
-        TableName: local-events
+        TableName: events
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S

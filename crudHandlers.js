@@ -6,11 +6,11 @@ const merge = require('lodash').merge;
 const DYNAMO_DB_ERROR = require('./utils').DYNAMO_DB_ERROR;
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
-module.exports.createHandler = function(table) {
+module.exports.createHandler = function(table, preprocess) {
   return function(event, callback) {
-    const data = JSON.parse(event.body);
-
+    const data = (typeof preprocess === 'function') ? preprocess(JSON.parse(event.body)) : JSON.parse(event.body);
     const datetime = new Date().getTime();
+    
     merge(data, {
       id: uuid.v1(),
       createdAt: datetime,
