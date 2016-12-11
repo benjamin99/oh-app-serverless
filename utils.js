@@ -39,6 +39,8 @@ function handlerError(context, headers, error) {
     return handleJoiError(context, headers, error);
   }
 
+  console.log(`unexpected error: ${error}`);
+
   render(context, 500, headers, {
     error: ERROR_CODE.unknown,
     message: 'unknown error'
