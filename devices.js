@@ -28,7 +28,8 @@ module.exports.create = (event, context, callback) => {
 };
 
 module.exports.list = (event, context, callback) => {
-  list(event)
+  const params = {};
+  list(params)
     .then(result => render(context, 200, headers, result))
     .catch(error => handleError(context, headers, error));
 };

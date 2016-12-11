@@ -9,7 +9,7 @@ const ERROR_CODE = utils.ERROR_CODE;
 const render = utils.render;
 const handleError = utils.handleError;
 
-const table = 'events';
+const table = 'geoEvents';
 
 /** member CRUD implementations */
 
@@ -35,6 +35,12 @@ const createSchema = Joi.object().keys({
   longitude: Joi.number()
 }).requiredKeys('title', 'content', 'latitude', 'longitude');
 
+const listSchema = Joi.object().keys({
+  latitude: Joi.number(),
+  longitude: Joi.number(),
+  limit: Joi.number().integer().default(30)
+}).with('latitude', 'longitude');
+
 /** lambda function implementations */
 
 const headers = { 'Access-Control-Allow-Origin': '*' };
@@ -47,7 +53,20 @@ module.exports.create = (event, context, callback) => {
 };
 
 module.exports.list = (event, context, callback) => {
-  list(event)
+  Joi.validateAsync(event.queryStringParameters, listSchema)
+    .then(form => {
+      console.log(form);
+      const params = {};
+      if (form.latitude) {
+        const hash = geohash.encode(form.latitude, form.longitude, 10);
+        const neighbors = geohash.neighbors(hash);
+        console.log(neighbors);
+      }
+
+      // query with the neighbors ...
+
+      return list(params);
+    })
     .then(result => render(context, 200, headers, result))
     .catch(error => handleError(context, headers, error));
 };

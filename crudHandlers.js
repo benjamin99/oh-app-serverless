@@ -34,8 +34,8 @@ module.exports.createHandler = function(table, preprocess) {
 };
 
 module.exports.listHandler = function(table) {
-  return function(event, callback) {
-    const params = { TableName: table };
+  return function(params, callback) {
+    params.TableName = table;
     return dynamo.scan(params, (error, data) => {
       if (error) {
         error.name = DYNAMO_DB_ERROR;

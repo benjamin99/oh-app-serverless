@@ -151,13 +151,17 @@ resources:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
-        TableName: events
+        TableName: geoEvents
         AttributeDefinitions:
           - AttributeName: id
+            AttributeType: S
+          - AttributeName: geohash
             AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+          - AttributeName: geohash
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
