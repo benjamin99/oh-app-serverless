@@ -1,6 +1,7 @@
 'use strict';
 
 const Promise = require('bluebird');
+const _ = require('lodash');
 const uuid = require('uuid');
 const merge = require('lodash').merge;
 const Joi = Promise.promisifyAll(require('joi'));
@@ -68,32 +69,47 @@ module.exports.create = (event, context, callback) => {
     .catch(error => handleError(context, headers, error));
 };
 
+
+function queryPromiseWithHash(hash) {
+  const params = {
+    KeyConditionExpression: 'geohash = :hashValue',
+    ExpressionAttributeValues: {
+      ':hashValue': hash
+    }
+  };
+
+  return query(params);
+}
+
 module.exports.list = (event, context, callback) => {
   const queryParams = event.queryStringParameters || {};
   Joi.validateAsync(queryParams, listSchema)
     .then(form => {
-      console.log(form);
-  
       if (form.latitude) {
         const origin = ngeohash.encode(form.latitude, form.longitude, 10);
         console.log('origin: ' + origin);
-        const neighbors = ngeohash.neighbors(origin);
-        console.log(neighbors);
+        const searchResions = ngeohash.neighbors(origin);
+        searchResions.push(origin);
+        console.log(searchResions);
 
-        // query with the neighbors ...
-        const params = {
-          KeyConditionExpression: 'geohash = :hash0',
-          ExpressionAttributeValues: {
-            ':hash0': origin
-          }
-        };
-
-        return query(params);
+        return Promise.all(_.map(searchResions, hash => queryPromiseWithHash(hash)));
       }
       
       return list({});
     })
-    .then(result => render(context, 200, headers, result))
+    .then(result => {
+      if (Array.isArray(result)) {
+        const collection = [];
+        for (const r of result) {
+          for (const item of r.Items) {
+            collection.push(item);
+          }
+        }
+        
+        return render(context, 200, headers, collection);
+      }
+      render(context, 200, headers, result)
+    })
     .catch(error => handleError(context, headers, error));
 };
 
