@@ -1,6 +1,8 @@
 'use strict';
 
 const Promise = require('bluebird');
+const uuid = require('uuid');
+const merge = require('lodash').merge;
 // const Joi = Promise.promisifyAll(require('joi'));
 const table = 'devices';
 const crud = require('./crudHandlers');
@@ -22,7 +24,16 @@ const destroy = Promise.promisify(crud.destroyHandler(table));
 const headers = { 'Access-Control-Allow-Origin': '*' };
 
 module.exports.create = (event, context, callback) => {
-  create(event)
+  const data = JSON.parse(event.body);
+  const datetime = new Date().getTime();
+
+  merge(data, {
+    id: uuid.v4(),
+    createdAt: datetime,
+    updatedAt: datetime
+  });
+
+  create(data)
     .then(result => render(context, 201, headers, result))
     .catch(error => handleError(context, headers, error));
 };

@@ -120,7 +120,7 @@ functions:
 
 resources:
   Resources:
-    MemberTable:
+    MembersTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
@@ -134,7 +134,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
-    DeviceTable:
+    DevicesTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: devices
@@ -147,20 +147,20 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
-    EventTable:
+    EventsTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
-        TableName: geoEvents
+        TableName: events
         AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
           - AttributeName: geohash
+            AttributeType: S
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: id
-            KeyType: HASH
           - AttributeName: geohash
+            KeyType: HASH
+          - AttributeName: id
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5

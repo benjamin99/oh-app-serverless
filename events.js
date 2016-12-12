@@ -1,25 +1,23 @@
 'use strict';
 
 const Promise = require('bluebird');
+const uuid = require('uuid');
+const merge = require('lodash').merge;
 const Joi = Promise.promisifyAll(require('joi'));
-const geohash = require('ngeohash');
+const ngeohash = require('ngeohash');
 const crud = require('./crudHandlers');
 const utils = require('./utils');
 const ERROR_CODE = utils.ERROR_CODE;
 const render = utils.render;
 const handleError = utils.handleError;
 
-const table = 'geoEvents';
+const table = 'events';
 
 /** member CRUD implementations */
 
-function eventCreatePreprocess(data) {
-  data.geohash = geohash.encode(data.latitude, data.longitude, 10);
-  return data;
-}
-
-const create = Promise.promisify(crud.createHandler(table, eventCreatePreprocess));
+const create = Promise.promisify(crud.createHandler(table));
 const list = Promise.promisify(crud.listHandler(table));
+const query = Promise.promisify(crud.queryHandler(table));
 const show = Promise.promisify(crud.showHandler(table));
 const update = Promise.promisify(crud.updateHandler(table));
 const destroy = Promise.promisify(crud.destroyHandler(table));
@@ -41,31 +39,59 @@ const listSchema = Joi.object().keys({
   limit: Joi.number().integer().default(30)
 }).with('latitude', 'longitude');
 
+/* utilities */
+function createEventData(form, memberId) {
+  const datetime = new Date().getTime();
+  const geohash = ngeohash.encode(form.latitude, form.longitude, 10);
+  const rangeKeyValue = `${datetime}:${memberId}`;
+
+  return merge(form, {
+    id: uuid.v4(),
+    createdAt: datetime,
+    updatedAt: datetime,
+    geohash,
+    rangeKeyValue
+  });
+}
+
 /** lambda function implementations */
 
 const headers = { 'Access-Control-Allow-Origin': '*' };
 
 module.exports.create = (event, context, callback) => {
   Joi.validateAsync(event.body, createSchema)
-    .then(form => { return create(event); })
+    .then(form => {
+      const data = createEventData(form, '12'); // TODO: get the memberId
+      return create(data); 
+    })
     .then(result => render(context, 201, headers, result))
     .catch(error => handleError(context, headers, error));
 };
 
 module.exports.list = (event, context, callback) => {
-  Joi.validateAsync(event.queryStringParameters, listSchema)
+  const queryParams = event.queryStringParameters || {};
+  Joi.validateAsync(queryParams, listSchema)
     .then(form => {
       console.log(form);
-      const params = {};
+  
       if (form.latitude) {
-        const hash = geohash.encode(form.latitude, form.longitude, 10);
-        const neighbors = geohash.neighbors(hash);
+        const origin = ngeohash.encode(form.latitude, form.longitude, 10);
+        console.log('origin: ' + origin);
+        const neighbors = ngeohash.neighbors(origin);
         console.log(neighbors);
+
+        // query with the neighbors ...
+        const params = {
+          KeyConditionExpression: 'geohash = :hash0',
+          ExpressionAttributeValues: {
+            ':hash0': origin
+          }
+        };
+
+        return query(params);
       }
-
-      // query with the neighbors ...
-
-      return list(params);
+      
+      return list({});
     })
     .then(result => render(context, 200, headers, result))
     .catch(error => handleError(context, headers, error));

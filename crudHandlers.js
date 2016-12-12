@@ -1,22 +1,11 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const uuid = require('uuid');
-const merge = require('lodash').merge;
 const DYNAMO_DB_ERROR = require('./utils').DYNAMO_DB_ERROR;
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
-module.exports.createHandler = function(table, preprocess) {
-  return function(event, callback) {
-    const data = (typeof preprocess === 'function') ? preprocess(JSON.parse(event.body)) : JSON.parse(event.body);
-    const datetime = new Date().getTime();
-    
-    merge(data, {
-      id: uuid.v1(),
-      createdAt: datetime,
-      updatedAt: datetime
-    });
-
+module.exports.createHandler = function(table) {
+  return function(data, callback) {
     const params = {
       TableName: table,
       Item: data
@@ -46,6 +35,20 @@ module.exports.listHandler = function(table) {
     });
   };
 };
+
+module.exports.queryHandler = function(table) {
+  return function(params, callback) {
+    params.TableName = table;
+    return dynamo.query(params, (error, data) => {
+      if (error) {
+        error.name = DYNAMO_DB_ERROR;
+        return callback(error);
+      }
+
+      callback(error, data);
+    })
+  }
+}
 
 module.exports.showHandler = function(table) {
   return function(event, callback) {
