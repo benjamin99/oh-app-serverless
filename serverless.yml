@@ -22,97 +22,97 @@ provider:
 
 functions:
   index:
-    handler: handler.index
+    handler: handlers.index
     events:
       - http:
-          path: /index
+          path: /
           method: get
   event-create:
-    handler: events.create
+    handler: handlers.events.create
     events:
       - http:
           path: /events
           method: post
   event-list:
-    handler: events.list
+    handler: handlers.events.list
     events:
       - http:
           path: /events
           method: get
   event-show:
-    handler: events.show
+    handler: handlers.events.show
     events:
       - http:
           path: /events/{id}
           method: get
   event-update:
-    handler: events.update
+    handler: handlers.events.update
     events:
       - http:
           path: /events/{id}
           method: put
   event-delete:
-    handler: events.destroy
+    handler: handlers.events.destroy
     events:
       - http:
           path: /events/{id}
           method: delete
   member-create:
-    handler: members.create
+    handler: handlers.members.create
     events:
       - http:
           path: /members
           method: post
   member-list:
-    handler: members.list
+    handler: handlers.members.list
     events:
       - http:
           path: /members
           method: get
   member-show:
-    handler: members.show
+    handler: handlers.members.show
     events:
       - http:
           path: /members/{id}
           method: get
   member-update:
-    handler: members.update
+    handler: handlers.members.update
     events:
       - http:
           path: /members/{id}
           method: put
   member-delete:
-    handler: members.delete
+    handler: handlers.members.delete
     events:
       - http:
           path: /members/{id}
           method: delete
   device-create:
-    handler: devices.create
+    handler: handlers.devices.create
     events:
       - http:
           path: /devices
           method: post
   device-list:
-    handler: devices.list
+    handler: handlers.devices.list
     events:
       - http:
           path: /devices
           method: get
   device-show:
-    handler: devices.show
+    handler: handlers.devices.show
     events:
       - http:
           path: /devices/{id}
           method: get
   device-update:
-    handler: devices.update
+    handler: handlers.devices.update
     events:
       - http:
           path: /devices/{id}
           method: put
   device-delete:
-    handler: devices.delete
+    handler: handlers.devices.delete
     events:
       - http:
           path: /devices/{id}
