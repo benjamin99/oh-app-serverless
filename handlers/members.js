@@ -2,7 +2,6 @@
 
 const Promise = require('bluebird');
 const uuid = require('uuid');
-const merge = require('lodash').merge;
 const Joi = Promise.promisifyAll(require('joi'));
 const crud = require('./crudHandlers');
 const utils = require('./utils');
@@ -32,15 +31,8 @@ const headers = { 'Access-Control-Allow-Origin': '*' };
 
 module.exports.create = (event, context, callback) => {
   Joi.validateAsync(event.body, memberCreateSchema).then((form) => {
-    const datetime = new Date().getTime();
-    merge(form, {
-      id: uuid.v4(),
-      createdAt: datetime,
-      updatedAt: datetime
-    });
-
+    form.id = uuid.v4();
     return create(form);
-
   }).then((result) => {
     render(context, 201, headers, result);
   }).catch(error => handleError(context, headers, error));

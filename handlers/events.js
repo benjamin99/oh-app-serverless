@@ -41,6 +41,7 @@ const listSchema = Joi.object().keys({
 }).with('latitude', 'longitude');
 
 /* utilities */
+
 function createEventData(form, memberId) {
   const datetime = new Date().getTime();
   const geohash = ngeohash.encode(form.latitude, form.longitude, 10);
@@ -48,11 +49,18 @@ function createEventData(form, memberId) {
 
   return merge(form, {
     id: uuid.v4(),
-    createdAt: datetime,
-    updatedAt: datetime,
     geohash,
     rangeKeyValue
   });
+}
+
+function queryPromiseWithHash(hash) {
+  const params = {
+    KeyConditionExpression: 'geohash = :hashValue',
+    ExpressionAttributeValues: { ':hashValue': hash }
+  };
+
+  return query(params);
 }
 
 /** lambda function implementations */
@@ -68,18 +76,6 @@ module.exports.create = (event, context, callback) => {
     .then(result => render(context, 201, headers, result))
     .catch(error => handleError(context, headers, error));
 };
-
-
-function queryPromiseWithHash(hash) {
-  const params = {
-    KeyConditionExpression: 'geohash = :hashValue',
-    ExpressionAttributeValues: {
-      ':hashValue': hash
-    }
-  };
-
-  return query(params);
-}
 
 module.exports.list = (event, context, callback) => {
   const queryParams = event.queryStringParameters || {};

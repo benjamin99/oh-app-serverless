@@ -21,98 +21,98 @@ provider:
     Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
 functions:
-  index:
-    handler: handlers.index
+  health-check:
+    handler: handlers/healthCheck.index
     events:
       - http:
           path: /
           method: get
   event-create:
-    handler: handlers.events.create
+    handler: handlers/events.create
     events:
       - http:
           path: /events
           method: post
   event-list:
-    handler: handlers.events.list
+    handler: handlers/events.list
     events:
       - http:
           path: /events
           method: get
   event-show:
-    handler: handlers.events.show
+    handler: handlers/events.show
     events:
       - http:
           path: /events/{id}
           method: get
   event-update:
-    handler: handlers.events.update
+    handler: handlers/events.update
     events:
       - http:
           path: /events/{id}
           method: put
   event-delete:
-    handler: handlers.events.destroy
+    handler: handlers/events.destroy
     events:
       - http:
           path: /events/{id}
           method: delete
   member-create:
-    handler: handlers.members.create
+    handler: handlers/members.create
     events:
       - http:
           path: /members
           method: post
   member-list:
-    handler: handlers.members.list
+    handler: handlers/members.list
     events:
       - http:
           path: /members
           method: get
   member-show:
-    handler: handlers.members.show
+    handler: handlers/members.show
     events:
       - http:
           path: /members/{id}
           method: get
   member-update:
-    handler: handlers.members.update
+    handler: handlers/members.update
     events:
       - http:
           path: /members/{id}
           method: put
   member-delete:
-    handler: handlers.members.delete
+    handler: handlers/members.delete
     events:
       - http:
           path: /members/{id}
           method: delete
   device-create:
-    handler: handlers.devices.create
+    handler: handlers/devices.create
     events:
       - http:
           path: /devices
           method: post
   device-list:
-    handler: handlers.devices.list
+    handler: handlers/devices.list
     events:
       - http:
           path: /devices
           method: get
   device-show:
-    handler: handlers.devices.show
+    handler: handlers/devices.show
     events:
       - http:
           path: /devices/{id}
           method: get
   device-update:
-    handler: handlers.devices.update
+    handler: handlers/devices.update
     events:
       - http:
           path: /devices/{id}
           method: put
   device-delete:
-    handler: handlers.devices.delete
+    handler: handlers/devices.delete
     events:
       - http:
           path: /devices/{id}
@@ -159,6 +159,24 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: geohash
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    ReactionsTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: reactions
+        AttributeDefinitions:
+          - AttributeName: targetId
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: targetId
             KeyType: HASH
           - AttributeName: id
             KeyType: RANGE
