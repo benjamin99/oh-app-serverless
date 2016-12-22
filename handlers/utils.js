@@ -15,7 +15,8 @@ const ERROR_CODE = module.exports.ERROR_CODE = {
   // 12xx: resource error
   memberNotFound: 1200,
   deviceNotFound: 1201,
-  eventNotFound: 1202
+  eventNotFound: 1202,
+  reactionNotFound: 1203
 
   // 13xx: data error
 

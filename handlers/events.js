@@ -104,7 +104,7 @@ module.exports.list = (event, context, callback) => {
         
         return render(context, 200, headers, collection);
       }
-      render(context, 200, headers, result)
+      render(context, 200, headers, result);
     })
     .catch(error => handleError(context, headers, error));
 };

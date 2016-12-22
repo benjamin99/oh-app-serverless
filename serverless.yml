@@ -57,6 +57,30 @@ functions:
       - http:
           path: /events/{id}
           method: delete
+  event-reaction-create:
+    handler: handlers/reactions.create
+    events:
+      - http: 
+          path: /events/{id}/reactions
+          method: post
+  event-reaction-list:
+    handler: handlers/reactions.list
+    events:
+      - http:
+          path: /events/{id}/reactions
+          method: get
+  event-reaction-show:
+    handler: handlers/reactions.show
+    events:
+      - http:
+          path: /events/{id}/reactions/{reactionId}
+          method: get
+  event-reaction-delete:
+    handler: handlers/reactions.destroy
+    events:
+      - http:
+          path: /events/{id}/reactions/{reactionId}
+          method: delete
   member-create:
     handler: handlers/members.create
     events:

@@ -186,4 +186,19 @@ module.exports.destroyHandler = function(table) {
       callback(error, data);
     });
   }
-}
+};
+
+module.exports.deleteHandler = function(table) {
+  return function(params, callback) {
+    params.TableName = table;
+    params.ReturnValues = 'ALL_OLD';
+    return dynamo.delete(params, (error, data) => {
+      if (error) {
+        error.name = DYNAMO_DB_ERROR;
+        return callback(error);
+      }
+
+      callback(error, data);
+    });
+  };
+};
