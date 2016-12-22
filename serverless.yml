@@ -20,6 +20,13 @@ provider:
       - dynamodb:DeleteItem
     Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
+plugins:
+  - serverless-webpack
+
+custom:
+  webpackIncludeModules: true
+  webpack: ./webpack.config.js
+
 functions:
   health-check:
     handler: handlers/healthCheck.index
