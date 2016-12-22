@@ -125,8 +125,8 @@ module.exports.destroy = (event, context, callback) => {
   return destroy(params).then(result => {
     if (!result.Attributes) {
       return render(context, 404, headers, {
-        error: ERROR_CODE.eventNotFound,
-        message: 'event not found'
+        error: ERROR_CODE.reactionNotFound,
+        message: 'reaction not found'
       });
     }
 
