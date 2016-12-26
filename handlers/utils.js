@@ -23,6 +23,13 @@ const ERROR_CODE = module.exports.ERROR_CODE = {
   // 14xx: auth error
 };
 
+function renderWithCallback(context, statusCode, headers, body, callback) {
+  context.callbackWaitsForEmptyEventLoop = false; 
+  callback(null, { statusCode, headers, body: JSON.stringify(body) });
+}
+
+module.exports.renderWithCallback = renderWithCallback;
+
 function render(context, statusCode, headers, body) {
   context.succeed({
     statusCode,

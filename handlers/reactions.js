@@ -7,7 +7,7 @@ const Joi = Promise.promisifyAll(require('joi'));
 const crud = require('./crudHandlers');
 const utils = require('./utils');
 const ERROR_CODE = utils.ERROR_CODE;
-const render = utils.render;
+const render = utils.renderWithCallback;
 const handleError = utils.handleError;
 
 const table = 'reactions';
@@ -87,14 +87,14 @@ module.exports.create = (event, context, callback) => {
       const data = createReactionData(targetId, form);
       return create(data);
     })
-    .then(result => render(context, 201, headers, result))
+    .then(result => render(context, 201, headers, result, callback))
     .catch(error => handleError(context, headers, error));
 };
 
 module.exports.list = (event, context, callback) => {
   const targetId = getTargetId(event);
   return listQueryPromise(targetId)
-    .then(result => render(context, 200, headers, result.Items))
+    .then(result => render(context, 200, headers, result.Items, callback))
     .catch(error => handleError(context, headers, error));
 };
 
@@ -110,7 +110,7 @@ module.exports.show = (event, context, callback) => {
         message: 'reaction not found'
       };
 
-      render(context, status, headers, body);
+      render(context, status, headers, body, callback);
     })
     .catch(error => handleError(context, headers, error));
 };
@@ -127,9 +127,9 @@ module.exports.destroy = (event, context, callback) => {
       return render(context, 404, headers, {
         error: ERROR_CODE.reactionNotFound,
         message: 'reaction not found'
-      });
+      }, callback);
     }
 
-    render(context, 200, headers, { id: result.Attributes.id });
+    render(context, 200, headers, { id: result.Attributes.id }, callback);
   }).catch(error => handleError(context, headers, error));
 };

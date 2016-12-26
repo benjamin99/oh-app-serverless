@@ -6,7 +6,7 @@ const Joi = Promise.promisifyAll(require('joi'));
 const crud = require('./crudHandlers');
 const utils = require('./utils');
 const ERROR_CODE = utils.ERROR_CODE;
-const render = utils.render;
+const render = utils.renderWithCallback;
 const handleError = utils.handleError;
 
 const table = 'members';
@@ -34,14 +34,14 @@ module.exports.create = (event, context, callback) => {
     form.id = uuid.v4();
     return create(form);
   }).then((result) => {
-    render(context, 201, headers, result);
+    render(context, 201, headers, result, callback);
   }).catch(error => handleError(context, headers, error));
 };
 
 module.exports.list = (event, context, callback) => {
   const params = {};
   list(params)
-    .then(result => render(context, 200, headers, result))
+    .then(result => render(context, 200, headers, result, callback))
     .catch(error => handleError(context, headers, error));
 };
 
@@ -53,14 +53,14 @@ module.exports.show = (event, context, callback) => {
       message: 'member not found'
     };
 
-    render(context, status, headers, body);
+    render(context, status, headers, body, callback);
 
   }).catch(error => handleError(context, headers, error));
 };
 
 module.exports.update = (event, context, callback) => {
   update(event)
-    .then(result => render(context, 200, headers, result))
+    .then(result => render(context, 200, headers, result, callback))
     .catch(error => handleError(context, headers, error));
 };
 
@@ -73,7 +73,7 @@ module.exports.delete = (event, context, callback) => {
       });
     }
 
-    render(context, 200, headers, { id: result.Attributes.id });
+    render(context, 200, headers, { id: result.Attributes.id }, callback);
 
   }).catch(error => handleError(context, headers, error));
 };
