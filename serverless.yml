@@ -189,6 +189,8 @@ resources:
             AttributeType: S
           - AttributeName: id
             AttributeType: S
+          - AttributeName: rangeKeyValue
+            AttributeType: S
         KeySchema:
           - AttributeName: geohash
             KeyType: HASH
@@ -197,6 +199,30 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
+        LocalSecondaryIndexes:
+          - IndexName: rangeKeyValueIndex
+            KeySchema:
+              - AttributeName: geohash
+                KeyType: HASH
+              - AttributeName: rangeKeyValue
+                KeyType: RANGE
+            Projection:
+              NonKeyAttributes:
+                - id
+              ProjectionType: INCLUDE
+        GlobalSecondaryIndexes:
+          - IndexName: eventsIdIndex
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            Projection:
+              NonKeyAttributes:
+                - id
+                - rangeKeyValue
+              ProjectionType: INCLUDE
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
     ReactionsTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain

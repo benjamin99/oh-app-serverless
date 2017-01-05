@@ -19,7 +19,6 @@ const table = 'events';
 const create = Promise.promisify(crud.createHandler(table));
 const list = Promise.promisify(crud.listHandler(table));
 const query = Promise.promisify(crud.queryHandler(table));
-const show = Promise.promisify(crud.showHandler(table));
 const update = Promise.promisify(crud.updateHandler(table));
 const destroy = Promise.promisify(crud.destroyHandler(table));
 
@@ -59,6 +58,19 @@ function queryPromiseWithHash(hash) {
     KeyConditionExpression: 'geohash = :hashValue',
     ExpressionAttributeValues: { ':hashValue': hash }
   };
+
+  return query(params);
+}
+
+function queryPromiseWithEventId(eventId) {
+  console.log('test with id: ' + eventId)
+  const params = {
+    IndexName: 'eventsIdIndex',
+    KeyConditionExpression: 'id = :eventId',
+    ExpressionAttributeValues: {
+      ':eventId': eventId
+    }
+  }
 
   return query(params);
 }
@@ -110,9 +122,10 @@ module.exports.list = (event, context, callback) => {
 };
 
 module.exports.show = (event, context, callback) => {
-  show(event).then(item => {
-    const status = item ? 200 : 404
-    const body = item ? item : {
+  const eventId = event.pathParameters.id;
+  queryPromiseWithEventId(eventId).then(response => {
+    const status = response.Count ? 200 : 404
+    const body = response.Count ? response.Items[0] : {
       error: ERROR_CODE.eventNotFound,
       message: 'event not found'
     };
