@@ -219,6 +219,9 @@ resources:
               NonKeyAttributes:
                 - id
                 - rangeKeyValue
+                - latitude
+                - longitude
+                - title
               ProjectionType: INCLUDE
             ProvisionedThroughput:
               ReadCapacityUnits: 5
