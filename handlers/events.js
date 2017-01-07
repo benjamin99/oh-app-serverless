@@ -20,7 +20,7 @@ const create = Promise.promisify(crud.createHandler(table));
 const list = Promise.promisify(crud.listHandler(table));
 const query = Promise.promisify(crud.queryHandler(table));
 const update = Promise.promisify(crud.updateHandler(table));
-const destroy = Promise.promisify(crud.destroyHandler(table));
+const destroy = Promise.promisify(crud.deleteHandler(table));
 
 /** Joi schemas */
 
@@ -141,7 +141,26 @@ module.exports.update = (event, context, callback) => {
 };
 
 module.exports.destroy = (event, context, callback) => {
-  destroy(event).then(result => {
+  const id = event.pathParameters.id;
+  queryPromiseWithEventId(id).then(response => {
+    if (!response.Count) {
+      const error = {
+        error: ERROR_CODE.eventNotFound,
+        message: 'event not found'
+      };
+
+      throw error;
+    }
+
+    const item = response.Items[0];
+    const params = {
+      Key: {
+        geohash: item.geohash,
+        id
+      }
+    }
+    return destroy(params)
+  }).then(result => {
     if (!result.Attributes) {
       return render(context, 404, headers, {
         error: ERROR_CODE.eventNotFound,
@@ -151,5 +170,11 @@ module.exports.destroy = (event, context, callback) => {
 
     render(context, 200, headers, { id: result.Attributes.id }, callback);
 
-  }).catch(error => handleError(context, headers, error));
+  }).catch(error => {
+    if (error.error === ERROR_CODE.eventNotFound) {
+      return render(context, 404, headers, error, callback);
+    }
+    
+    handleError(context, headers, error)
+  });
 };
